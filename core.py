@@ -48,8 +48,10 @@ def quantize(img, dither, transparency_treshold):
 
 def imgtomsch(imgfile, name, save_location, dither, transparency_treshold):
     
-    img = quantize(Image.open(imgfile), dither, transparency_treshold)[0].rotate(-90, expand=True)
-    imgA = quantize(Image.open(imgfile), dither, transparency_treshold)[1].rotate(-90, expand=True)
+    img, imgA = quantize(Image.open(imgfile), dither, transparency_treshold)
+    
+    imgA = imgA.rotate(-90, expand=True)
+    img = img.rotate(-90, expand=True)
     
     width, height = img.size
     for y in range(img.size[1]):
