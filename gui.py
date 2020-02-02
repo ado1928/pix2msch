@@ -1,3 +1,4 @@
+from sys import platform
 from tkinter import *
 from tkinter import filedialog
 from tkinter import messagebox
@@ -43,7 +44,14 @@ class GUI():
         transparency_entry.place(x = 300, y = 338)
         
         name_entry.insert(0, "schematic")
-        path_entry.insert(0, "%appdata%\\Mindustry\\schematics")
+        
+        if platform == "windows":
+            path_entry.insert(0, "%appdata%\\Mindustry\\schematics")
+        elif platform == "linux":
+            path_entry.insert(0, "~/.local/share/Mindustry/schematics/")
+        else:
+            path_entry.insert(0, "Enter Mindustry schematic path...")
+         
         transparency_entry.insert(0, "127")
         
         self.open_image_b = Button(root, font = font, command=self.open_image, text = "Open Image...", bg = "#35373C", fg = "#B7BBCE", activebackground="#515359", activeforeground="#cccccc", bd = 0)
