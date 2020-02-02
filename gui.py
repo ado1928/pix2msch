@@ -45,7 +45,7 @@ class GUI():
         
         name_entry.insert(0, "schematic")
         
-        if platform == "windows":
+        if platform == "win32":
             path_entry.insert(0, "%appdata%\\Mindustry\\schematics")
         elif platform == "linux":
             path_entry.insert(0, "~/.local/share/Mindustry/schematics/")
