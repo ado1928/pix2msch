@@ -2,6 +2,7 @@
 A program that converts images into Mindustry schematics
 
 The usage should be pretty self explainatory once you open gui.py
+
 If you're on Windows, you can go to releases, download the .zip, extract it, and run the .exe, no Python installation needed.
 
 Note: You will need `pyperclip` and `pillow` to run pix2msch. You can install them by doing `pip <package>`
