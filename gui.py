@@ -11,6 +11,18 @@ except Exception as e:
     print(e)
     input()
 
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+
 class GUI():
     def __init__(self, root):
         self.root = root
@@ -18,7 +30,7 @@ class GUI():
         root.resizable(False, False)
         root.geometry("600x500")
 
-        photo = PhotoImage(file = "background.png")
+        photo = PhotoImage(file = resource_path("background.png"))
         background = Label(root, image = photo)
         background.image = photo
         background.place(x = -2, y = -2)
