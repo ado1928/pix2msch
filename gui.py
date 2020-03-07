@@ -1,10 +1,15 @@
-from sys import platform
-from tkinter import *
-from tkinter import filedialog
-from tkinter import messagebox
-import tkinter.font, os
-from PIL import Image, ImageTk
-import core
+try:
+    from tkinter import *
+    from tkinter import filedialog
+    from tkinter import messagebox
+    import tkinter.font, os
+    from PIL import Image, ImageTk
+    import core
+except Exception as e:
+    print("You're missing a package!")
+    print()
+    print(e)
+    input()
 
 class GUI():
     def __init__(self, root):
@@ -30,6 +35,7 @@ class GUI():
         )
         self.dither_c.place(x = 300, y = 375)
         
+        self.file = None
         self.name = StringVar()
         self.path = StringVar()
         self.transparency = StringVar()
@@ -44,89 +50,44 @@ class GUI():
         transparency_entry.place(x = 300, y = 338)
         
         name_entry.insert(0, "schematic")
-        
-        if platform == "win32":
-            path_entry.insert(0, "%appdata%\\Mindustry\\schematics")
-        elif platform == "linux" or platform == "linux2":
-            path_entry.insert(0, "~/.local/share/Mindustry/schematics/")
-        else:
-            path_entry.insert(0, "Enter Mindustry schematic path...")
-         
+        path_entry.insert(0, "%appdata%\\Mindustry\\schematics")
         transparency_entry.insert(0, "127")
         
         self.open_image_b = Button(root, font = font, command=self.open_image, text = "Open Image...", bg = "#35373C", fg = "#B7BBCE", activebackground="#515359", activeforeground="#cccccc", bd = 0)
         self.open_image_b.place(x = 300, y = 240, anchor = CENTER)
         
-        convert_b = Button(root, command=self.convert, font = font, text = "Convert to msch...", bg = "#35373C", fg = "#B7BBCE", activebackground="#515359", activeforeground="#cccccc", bd = 0)
-        convert_b.place(x = 350, y = 450, anchor = CENTER)
+        convert_b = Button(root, command = lambda : self.convert("path"), font = font, text = "Convert to msch...", bg = "#35373C", fg = "#B7BBCE", activebackground="#515359", activeforeground="#cccccc", bd = 0)
+        convert_b.place(x = 300, y = 450, anchor = CENTER)
         
         preview_b = Button(root, command=self.preview, font = font, text = "Preview", bg = "#35373C", fg = "#B7BBCE", activebackground="#515359", activeforeground="#cccccc", bd = 0)
-        preview_b.place(x = 200, y = 450, anchor = CENTER)
+        preview_b.place(x = 150, y = 450, anchor = CENTER)
         
-        
+        clipboard_b = Button(root, command= lambda : self.convert("clipboard"), font = font, text = "Copy", bg = "#35373C", fg = "#B7BBCE", activebackground="#515359", activeforeground="#cccccc", bd = 0)
+        clipboard_b.place(x = 435, y = 450, anchor = CENTER)
         
     def open_image(self):
         root.update()
         self.file = filedialog.askopenfilename()
         self.open_image_b.configure(text = self.file)
         try:
-            self.image = Image.open(self.file)
+            Image.open(self.file)
         except:
             self.open_image_b.configure(text = "Invalid Image file!")
-            
+            self.file = None
         root.update()
         
-    def convert(self):
-        try:
-            int(self.transparency.get())
-            self.image
-            if int(self.transparency.get()) > 255:
-                messagebox.showerror("Error", "Transparency Treshold must not exceed 255")
-                raise Exception
-            elif int(self.transparency.get()) < 0:
-                messagebox.showerror("Error", "Transparency Treshold must not be negative")
-                raise Exception
-            if not(os.path.isdir(os.path.expandvars(self.path.get()))):
-                messagebox.showerror("Error", "Invalid path")
-                raise Exception
-            if self.name.get() == "":
-                messagebox.showerror("Error", "Please enter a name")
-                raise Exception
-        except AttributeError:
-            messagebox.showerror("Error", "No image selected")
-        except ValueError:
-            messagebox.showerror("Error", "Transparency Treshold must be a number")
-        else:
+    def convert(self, mode):
             try:
-                core.imgtomsch(self.file, self.name.get(), self.path.get(), self.dither.get(), int(self.transparency.get()))
+                core.pix2msch(self.file, self.name.get(), self.path.get(), self.dither.get(), self.transparency.get(), mode)
             except Exception as e:
                 messagebox.showerror("oh no", e)
             else:
                 messagebox.showinfo("Success", "Successfully converted image to msch")
     
     def preview(self):
-        
         try:
-            self.window.destroy()
-        except:
-            pass
-        
-        try:
-            int(self.transparency.get())
-            self.image
-            if int(self.transparency.get()) > 255:
-                messagebox.showerror("Error", "Transparency Treshold must not exceed 255")
-                raise Exception
-            elif int(self.transparency.get()) < 0:
-                messagebox.showerror("Error", "Transparency Treshold must not be negative")
-                raise Exception
-        except AttributeError:
-            messagebox.showerror("Error", "No image selected")
-        except ValueError:
-            messagebox.showerror("Error", "Transparency Treshold must be a number")
-        else:
             targetsize = 700
-            qimg = core.quantize(self.image, self.dither.get(), 127)[1]
+            qimg = core.quantize(self.file, self.dither.get(), 127)[1]
             
             sizemultiplier = targetsize/max(qimg.size)
             self.window = Toplevel(root)
@@ -137,7 +98,9 @@ class GUI():
             self.window.image = image
             self.window.resizable(False, False)
             background.place(x = -2, y = -2)
-
+        except Exception as e:
+            messagebox.showerror("oh no", e)
+        
 root = Tk()
 try:
     GUI(root)

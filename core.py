@@ -1,6 +1,12 @@
-import struct, zlib, os
-from PIL import Image
-
+try:
+    import struct, zlib, os, base64, pyperclip
+    from PIL import Image
+except Exception as e:
+    print("You're missing a package!")
+    print()
+    print(e)
+    input()
+    
 tiles = []
 colorarray = [
     217, 157, 115,
@@ -27,6 +33,18 @@ palette.putpalette(colorarray*16)
 palette.load()
 
 def quantize(img, dither, transparency_treshold):
+    try:
+        img = Image.open(img)
+        transparency_treshold = int(transparency_treshold)
+    except AttributeError:
+        raise Exception("No image selected")
+    except ValueError:
+        raise Exception("Transparency Treshold must be a number")
+    
+    if transparency_treshold > 255:
+        raise Exception("Transparency Treshold must not exceed 255")
+    elif transparency_treshold < 0:
+        raise Exception("Transparency Treshold most not be negative")
     
     img = img.convert("RGBA")
     imgq = img.convert("RGB")
@@ -43,12 +61,23 @@ def quantize(img, dither, transparency_treshold):
                 pixels[x, y] = (0, 0, 0, 0)
 
     print("Quantization complete")
-    
     return (imgq, imgA)
 
-def imgtomsch(imgfile, name, save_location, dither, transparency_treshold):
+def pix2msch(imgfile, name, save_location, dither, transparency_treshold, mode):
+    print(imgfile)
     
-    img, imgA = quantize(Image.open(imgfile), dither, transparency_treshold)
+    if mode == "path":
+        if not(os.path.isdir(os.path.expandvars(save_location))):
+            raise Exception("Invalid path")
+        
+    if name == "":
+        raise Exception("Please enter a name")
+
+    
+    
+    
+    
+    img, imgA = quantize(imgfile, dither, transparency_treshold)
     
     imgA = imgA.rotate(-90, expand=True)
     img = img.rotate(-90, expand=True)
@@ -56,7 +85,7 @@ def imgtomsch(imgfile, name, save_location, dither, transparency_treshold):
     width, height = img.size
     for y in range(img.size[1]):
         for x in range(img.size[0]):
-            if imgA.getpixel((x, y))[3] > transparency_treshold:
+            if imgA.getpixel((x, y))[3] > 1:
                 tiles.append((x, y, tuple_array.index(img.getpixel((x, y)))))
 
     print("Converted pixels into an array of tiles")
@@ -103,10 +132,16 @@ def imgtomsch(imgfile, name, save_location, dither, transparency_treshold):
         data.writeByte(0)
 
     print("Tile data written")
+    
+    if mode == "path":
+        os.chdir(os.path.expandvars(save_location))
+        file = open(name + ".msch", "wb")
+        file.write(b"msch\x00"+zlib.compress(data.data))
+        file.close()
 
-    os.chdir(os.path.expandvars(save_location))
-    file = open(name + ".msch", "wb")
-    file.write(b"msch\x00"+zlib.compress(data.data))
-    file.close()
-
-    print("Successfully saved {0} ".format(name + ".msch"))
+        print("Successfully saved {0} ".format(name + ".msch"))
+        
+    else:
+        pyperclip.copy(base64.standard_b64encode(b"msch\x00"+zlib.compress(data.data)).decode())
+        print("Schematic converted to base64, and put into clipboard")
+        
