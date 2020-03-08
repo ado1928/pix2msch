@@ -1,10 +1,10 @@
 try:
+    from sys import platform
     from tkinter import *
     from tkinter import filedialog
     from tkinter import messagebox
-    import tkinter.font, os
     from PIL import Image, ImageTk
-    import core
+    import tkinter.font, os, core
 except Exception as e:
     print("You're missing a package!")
     print()
@@ -62,7 +62,13 @@ class GUI():
         transparency_entry.place(x = 300, y = 338)
         
         name_entry.insert(0, "schematic")
-        path_entry.insert(0, "%appdata%\\Mindustry\\schematics")
+        if platform == "win32":
+            path_entry.insert(0, "%appdata%\\Mindustry\\schematics")
+        elif platform == "linux" or platform == "linux2":
+            path_entry.insert(0, "~/.local/share/Mindustry/schematics/")
+        else:
+            path_entry.insert(0, "Enter Mindustry schematic path...")
+
         transparency_entry.insert(0, "127")
         
         self.open_image_b = Button(root, font = font, command=self.open_image, text = "Open Image...", bg = "#35373C", fg = "#B7BBCE", activebackground="#515359", activeforeground="#cccccc", bd = 0)
