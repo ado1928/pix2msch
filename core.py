@@ -85,7 +85,7 @@ def pix2msch(imgfile, name, save_location, dither, transparency_treshold, mode):
     width, height = img.size
     for y in range(img.size[1]):
         for x in range(img.size[0]):
-            if imgA.getpixel((x, y))[3] > transparency_treshold:
+            if imgA.getpixel((x, y))[3] > 1:
                 tiles.append((x, y, tuple_array.index(img.getpixel((x, y)))))
 
     print("Converted pixels into an array of tiles")
