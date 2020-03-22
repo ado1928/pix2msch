@@ -7,7 +7,6 @@ except Exception as e:
     print(e)
     input()
     
-tiles = []
 colorarray = [
     217, 157, 115,
     140, 127, 169,
@@ -64,7 +63,7 @@ def quantize(img, dither, transparency_treshold):
     return (imgq, imgA)
 
 def pix2msch(imgfile, name, save_location, dither, transparency_treshold, mode):
-    print(imgfile)
+    tiles = []
     
     if mode == "path":
         if not(os.path.isdir(os.path.expandvars(save_location))):
@@ -72,10 +71,6 @@ def pix2msch(imgfile, name, save_location, dither, transparency_treshold, mode):
         
     if name == "":
         raise Exception("Please enter a name")
-
-    
-    
-    
     
     img, imgA = quantize(imgfile, dither, transparency_treshold)
     
