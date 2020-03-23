@@ -9,4 +9,9 @@ Note: You will need `pyperclip` and `pillow` to run gui.py. You can install them
 
 WARNING: Images above 100x100 don't actually seem large, but when converted to a Mindustry schematic, it's actually huge, so I recommend to keep images below 100x100
 
+Here's a screenshot of the gui:
+  ![GUI](https://i.ibb.co/TPfc2MJ/Screenshot-203.png)
+
+The GUI is completely made with `tkinter`, and supports a lot of platforms
+
   ![WOMM](https://cdn.discordapp.com/attachments/676843444274069504/677566642888376320/WOMM.png)
