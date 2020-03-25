@@ -13,7 +13,6 @@ except Exception as e:
 
 
 def resource_path(relative_path):
-    """ Get absolute path to resource, works for dev and for PyInstaller """
     try:
         # PyInstaller creates a temp folder and stores path in _MEIPASS
         base_path = sys._MEIPASS
@@ -105,7 +104,7 @@ class GUI():
     def preview(self):
         try:
             targetsize = 700
-            qimg = core.quantize(self.file, self.dither.get(), 127)[1]
+            qimg = core.quantize(self.file, self.dither.get(), 127)
             
             sizemultiplier = targetsize/max(qimg.size)
             self.window = Toplevel(root)

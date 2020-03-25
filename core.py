@@ -26,12 +26,14 @@ colorarray = [
     255, 170, 95
     ]
 
+#convert array of ints into a list of tuples, then into a palette
 tuple_array = [tuple(colorarray[t*3:t*3+3]) for t in range(len(colorarray)//3)]
 palette = Image.new("P", (16, 16))
 palette.putpalette(colorarray*16)
 palette.load()
 
 def quantize(img, dither, transparency_treshold):
+    #invalid input checking
     try:
         img = Image.open(img)
         transparency_treshold = int(transparency_treshold)
@@ -45,26 +47,45 @@ def quantize(img, dither, transparency_treshold):
     elif transparency_treshold < 0:
         raise Exception("Transparency Treshold most not be negative")
     
-    img = img.convert("RGBA")
-    imgq = img.convert("RGB")
-    imgq = imgq._new(imgq.im.convert("P", 1 if dither else 0, palette.im))
-    
+    #sphagetti
+    img = img.convert("RGBA") # image 
+    imgq = img.convert("RGB") # fully opaque image
+    imgq = imgq._new(imgq.im.convert("P", 1 if dither else 0, palette.im)) #where the actual quantization happens
+
     imgA = Image.new("RGBA", img.size)
     pixels = imgA.load()
     imgq = imgq.convert("RGB")
+    
     for y in range(img.size[1]):
         for x in range(img.size[0]):
-            if img.getpixel((x, y))[3] > transparency_treshold:
+            if img.getpixel((x, y))[3] >= transparency_treshold: #transparency treshold
                 pixels[x, y] = imgq.getpixel((x, y))
             else:
                 pixels[x, y] = (0, 0, 0, 0)
 
     print("Quantization complete")
-    return (imgq, imgA)
 
-def pix2msch(imgfile, name, save_location, dither, transparency_treshold, mode):
+    return imgA
+
+
+# imgfile - Path to the image
+# name - Name of the schematic
+# save_location - Save location, i guess
+# dither - Whether to use dithering (True or False, 1 or 0)
+# transparency_treshold - Below which alpha level to stop displaying (0-255), where 0 is show everything and 255 is show only fully opaque
+# mode - Either "path" or "clipboard". Whether to save the schematic as .msch or to copy it into clipboard
+
+def pix2msch(imgfile               = None,
+             name                  = "schematic",
+             save_location         = None,
+             dither                = True,
+             transparency_treshold = 127,
+             mode                  = "path"
+             ): #sad face
+    
     tiles = []
     
+    #input checking
     if mode == "path":
         if not(os.path.isdir(os.path.expandvars(save_location))):
             raise Exception("Invalid path")
@@ -72,20 +93,20 @@ def pix2msch(imgfile, name, save_location, dither, transparency_treshold, mode):
     if name == "":
         raise Exception("Please enter a name")
     
-    img, imgA = quantize(imgfile, dither, transparency_treshold)
+    img = quantize(imgfile, dither, transparency_treshold)
     
-    imgA = imgA.rotate(-90, expand=True)
     img = img.rotate(-90, expand=True)
+    #img = img.rotate(-90, expand=True)
     
     width, height = img.size
-    for y in range(img.size[1]):
-        for x in range(img.size[0]):
-            if imgA.getpixel((x, y))[3] > 1:
-                tiles.append((x, y, tuple_array.index(img.getpixel((x, y)))))
+    for y in range(height):
+        for x in range(width):
+            if img.getpixel((x, y))[3] > 1:
+                tiles.append((x, y, tuple_array.index(img.getpixel((x, y))[0:3])))
 
     print("Converted pixels into an array of tiles")
 
-    class ByteBuffer():
+    class ByteBuffer(): #so desparate i had to write my own byte buffer
         def __init__(self, data=bytearray()):
             self.data = data
             
@@ -102,6 +123,7 @@ def pix2msch(imgfile, name, save_location, dither, transparency_treshold, mode):
         def writeInt(self, int):
             self.data += struct.pack(">i", int)
             
+    #write header and all of that stuff
     data = ByteBuffer()
 
     data.writeShort(width)
@@ -119,7 +141,7 @@ def pix2msch(imgfile, name, save_location, dither, transparency_treshold, mode):
 
     print("Header written")
 
-    for tile in tiles:
+    for tile in tiles: #write tiles
         data.writeByte(0)
         data.writeShort(tile[1])
         data.writeShort(tile[0])
@@ -127,6 +149,7 @@ def pix2msch(imgfile, name, save_location, dither, transparency_treshold, mode):
         data.writeByte(0)
 
     print("Tile data written")
+    
     
     if mode == "path":
         os.chdir(os.path.expandvars(save_location))
