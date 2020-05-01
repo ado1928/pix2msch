@@ -1,5 +1,5 @@
 try:
-    import struct, zlib, os, base64, pyperclip
+    import struct, zlib, os, base64
     from PIL import Image
 except Exception as e:
     print("You're missing a package!")
@@ -160,6 +160,11 @@ def pix2msch(imgfile               = None,
         print("Successfully saved {0} ".format(name + ".msch"))
         
     else:
-        pyperclip.copy(base64.standard_b64encode(b"msch\x00"+zlib.compress(data.data)).decode())
-        print("Schematic converted to base64, and put into clipboard")
+        try:
+            import pyperclip
+        except:
+            raise Exception("To use this feature, you need to have the pyperclip module")
+        else:
+            pyperclip.copy(base64.standard_b64encode(b"msch\x00"+zlib.compress(data.data)).decode())
+            print("Schematic converted to base64, and put into clipboard")
         
