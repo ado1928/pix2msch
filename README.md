@@ -40,9 +40,10 @@ Example:
 Sends a command through the **socketinput** port of the server.
  - `command` - **String.** Required. Command that gets sent to the server
  #
- `pydustry.Server.get_ping()`
+ `pydustry.Server.get_ping(timeout = 10.0)`
  Returns the **delay** it takes packets to come to the server and back in miliseconds **(ping)**.
 - `ping` - **Int.**
+- `timeout` - **Numeric**, optional
 #
  ## Example codes
  
