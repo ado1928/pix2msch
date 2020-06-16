@@ -1,75 +1,18 @@
+# pix2msch
+A program that converts images into Mindustry schematics
 
-# pydustry
-A Python package for controlling Mindustry servers and getting their current status
+The usage should be pretty self explainatory once you open gui.py
 
-## Documentation:
+If you're on Windows, you can go to releases, download and run pix2msch.exe. No Python installation needed.
 
+Note: You will need `pyperclip` and `pillow` to run gui.py. You can install them by doing `pip install <package>`
 
-`pydustry.Server(host, server_port = 6567, socketinput_port = 6859)`
+WARNING: Images above 100x100 don't actually seem large, but when converted to a Mindustry schematic, it's actually huge, so I recommend to keep images below 100x100
 
-**Server object.**
- - `host` - **String.** Required. IP address of the server
- - `server_port` - **Int.** Defaults at 6567. Port of the server.
- - `socketinput_port` - **Int**. Defaults at 6859. Socketinput port of the server.
-#
- `pydustry.Server.get_status()`
+Here's a screenshot of the gui:
 
-Returns the status of the server in the form of a dict.
+![GUI](https://i.ibb.co/TPfc2MJ/Screenshot-203.png)
 
-Example:
+The GUI is completely made with `tkinter`, and supports a lot of platforms
 
- `>>> pydustry.Server("exampleserver.com").get_status() `
-	will output
-
-    {"name": "Example Mindustry server",
-     "map": "Maze",
-     "players": 5, 
-     "wave": 10, 
-     "version": 89, 
-     "vertype": "official"}
-     
-   
- - `"name"` - **String.** Name of the server.
- - `"map"` - **String.** Map that the server is currently on.
- - `"players"` - **Int.** Number of players online.
- - `"wave"` - **Int**. Wave that the server is currently on.
- - `"version"` - **Int.** Version that the server is on
- - `"vertype"` - **String.** Version type of the server.
-#
-`pydustry.Server.send_command(command)`
-Sends a command through the **socketinput** port of the server.
- - `command` - **String.** Required. Command that gets sent to the server
- #
- `pydustry.Server.get_ping(timeout = 10.0)`
- Returns the **delay** it takes packets to come to the server and back in miliseconds **(ping)**.
-- `ping` - **Int.**
-- `timeout` - **Numeric**, optional
-#
- ## Example codes
- 
-
-    import pydustry
-    
-    # A program that will output the playercount and ping
-    
-    host = input("Enter the IP address of the Mindustry server:")
-    port = input("Enter the port of the Mindustry server:")
-    
-    server = pydustry.Server(host, int(port))
-    
-    playercount = server.get_status()["players"]
-    ping = server.ping()
-    
-    print("The number of players is: " + str(playercount))
-    print("And the ping is: " + str(ping))
-#
-    import pydustry, time
-    
-    # A program that will autosave the local server every 5 minutes
-    
-    server = pydustry.Server("localhost")
-    
-    while True:
-        server.send_command("save 0")
-        server.send_command("say Saved!")
-        time.sleep(300)
+![WOMM](https://cdn.discordapp.com/attachments/676843444274069504/677566642888376320/WOMM.png)
