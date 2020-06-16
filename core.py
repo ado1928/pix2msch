@@ -126,8 +126,8 @@ def pix2msch(imgfile               = None,
     #write header and all of that stuff
     data = ByteBuffer()
 
-    data.writeShort(width)
     data.writeShort(height)
+    data.writeShort(width)
 
     data.writeByte(1)
 
